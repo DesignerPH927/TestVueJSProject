@@ -150,6 +150,10 @@ const drinkList = {
             this.totalPrice = this.totalPrice - products.subTotal;
         },
         clickAddToCarts(products){
+            if (this.addToCarts.length == 0){
+                alert('要先點選飲品唷');
+                return;
+            }
             const calcPrice = {
                 ...products,
                 subTotal : (products.price + (products.toppings.length * 10) ) * products.count

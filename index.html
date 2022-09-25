@@ -101,20 +101,20 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th class="text-nowrap">飲品</th>
-                                        <th>冰塊</th>
-                                        <th>甜度</th>
-                                        <th>加料</th>
-                                        <th>單價</th>
-                                        <th>數量</th>
-                                        <th>小計</th>
-                                        <th class="d-none d-lg-block">刪除</th>
+                                        <th scope="col">飲品</th>
+                                        <th scope="col">冰塊</th>
+                                        <th scope="col">甜度</th>
+                                        <th scope="col">加料</th>
+                                        <th scope="col">單價</th>
+                                        <th scope="col">數量</th>
+                                        <th scope="col">小計</th>
+                                        <th scope="col">刪除</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="(item,key) in addToCarts"
                                     :key="'Carts' + key">
-                                        <th class="text-nowrap">{{item.name}}<br>
+                                        <th scope="row">{{item.name}}<br>
                                             <small class="text-muted"
                                             v-if="item.notice !==''">備註：{{item.notice}}</small>
                                         </th>
@@ -124,8 +124,8 @@
                                         <td>{{item.price +  (item.toppings.length * 10)}}</td>
                                         <td>{{item.count}}</td>
                                         <td class="text-end">{{item.subTotal}}</td>
-                                        <td><button type="button" class="btn btn-danger btn-sm d-none d-lg-block"
-                                            @click.prevent="clickDeleteItem(item)"><i class="bi bi-x"></i></button></td>
+                                        <td><button type="button" class="btn btn-sm" style="font-size: 12px;"
+                                            @click.prevent="clickDeleteItem(item)"><i class="bi bi-x-lg"></i></button></td>
                                     </tr>
                                     <tr v-if="addToCarts.length === 0">
                                         <th colspan="8" class="text-center fw-bold" style="letter-spacing:20px;">請選擇飲品</th>
