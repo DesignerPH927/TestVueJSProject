@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+</head>
+<body>
+    <div id="app">
+        <div class="container bg-danger mb-3">
+            <div class="row p-3 justify-content-center">
+                <div class="col-md-3">
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action"
+                        v-for="(item,key) in products" :key="item.name"
+                        @click.prevent="clickSelectProducts(item)"
+                        :class="{'active' : item.name === temporaryStorage.name}">
+                            <div class="card-title fw-bold">
+                                {{item.name}}
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <p class="mb-0"><small>{{item.engName}}</small></p>
+                                <p class="mb-0"><small>{{item.price}} 元</small></p>
+                            </div>
+                        </a>                        
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <!-- <div v-if="!temporaryStorage.name"class="position-absolute text-white d-flex justify-content-center align-items-center"
+                        style="top:0;right:0;bottom:0;left:0;background-color:rgba(0,0,0,0.66);z-index:100;letter-spacing: 20px;">
+                        請點選飲品</div> -->
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="num" class="form-label fw-bold">數量*</label>
+                                <input type="number" class="form-control" id="num" min="0"
+                                v-model="temporaryStorage.count">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="num" class="form-label d-block fw-bold">冰塊*</label>
+                                <div class="form-check-inline"
+                                v-for="(item,key) in iceType" :key="'ice' + key">
+                                    <input type="radio" class="form-check-input me-2" 
+                                    :id="'ice' + key" :value="item" v-model="temporaryStorage.ice"
+                                    :disabled="!temporaryStorage.hasOwnProperty('defaults') || (temporaryStorage.defaults.ice !=='' && temporaryStorage.defaults.ice !== item)">
+                                    <label :for="'ice' + key" class="form-check-label">{{item}}</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="num" class="form-label d-block fw-bold">甜度*</label>
+                                <div class="form-check-inline"
+                                v-for="(item,key) in sugarType" :key="'sugar' + key">
+                                    <input type="radio" class="form-check-input me-2" 
+                                    :id="'sugar' + key" :value="item" v-model="temporaryStorage.sugar"
+                                    :disabled="!temporaryStorage.hasOwnProperty('defaults') || (temporaryStorage.defaults.sugar !=='' && temporaryStorage.defaults.sugar !== item)">
+                                    <label :for="'sugar' + key" class="form-check-label">{{item}}</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="num" class="form-label d-block fw-bold">加料*</label>
+                                <div class="form-check-inline"
+                                v-for="(item,key) in toppingsType" :key="'toppings' + key">
+                                    <input type="checkbox" class="form-check-input me-2" 
+                                    :id="'toppings' + key" :value="item" v-model="temporaryStorage.toppings"
+                                    :disabled="!temporaryStorage.hasOwnProperty('defaults') || temporaryStorage.defaults.toppings.includes(item)">
+                                    <!-- include()：尋找並顯示布林值true or false -->
+                                    <!-- indexof()：尋找值並顯示數值，若找不到就顯示-1 -->
+                                    <!-- include與indexof一樣只是indexof顯示數字 -->
+                                    <label :for="'toppings' + key" class="form-check-label">{{item}}</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="notice" class="form-label fw-bold">備註</label>
+                                <textarea  id="notice"  rows="2" class="form-control"
+                                v-model="temporaryStorage.notice"
+                                :disabled="!temporaryStorage.name"></textarea>
+                            </div>
+
+                            <div class="d-flex gap-3">
+                                <button type="button" class="btn btn-primary w-100 fw-bold"
+                                @click.prevent="resetAddToCarts">取消</button>
+                                <button type="button" class="btn btn-primary w-100 fw-bold"
+                                @click.prevent="clickAddToCarts(temporaryStorage)">加入</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 購物車 -->
+                    <div class="card" >
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>飲品</th>
+                                        <th>冰塊</th>
+                                        <th>甜度</th>
+                                        <th>加料</th>
+                                        <th>單價</th>
+                                        <th>數量</th>
+                                        <th>小計</th>
+                                        <th>刪除</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item,key) in addToCarts"
+                                    :key="'Carts' + key">
+                                        <th>{{item.name}}<br>
+                                            <small class="text-muted"
+                                            v-if="item.notice !==''">備註：{{item.notice}}</small>
+                                        </th>
+                                        <td>{{item.ice}}</td>
+                                        <td>{{item.sugar}}</td>
+                                        <td>{{item.toppings.join()}}</td>
+                                        <td>{{item.price +  (item.toppings.length * 10)}}</td>
+                                        <td>{{item.count}}</td>
+                                        <td class="text-end">NT$ {{item.subTotal}} 元</td>
+                                        <td><button type="button" class="btn btn-danger btn-sm"
+                                            @click.prevent="clickDeleteItem(item)"><i class="bi bi-x-lg"></i></button></td>
+                                    </tr>
+                                    <tr v-if="addToCarts.length === 0">
+                                        <th colspan="8" class="text-center fw-bold" style="letter-spacing:20px;">請選擇飲品</th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="text-end fw-bold">總共 NT$ {{totalPrice}} 元</p>
+                            <button type="button" class="btn btn-outline-warning w-100 fw-bold"
+                            @click.prevent="clickGenerateOrder(addToCarts,totalPrice)">產生訂單</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>        
+        <!-- 產生訂單 -->
+        <div class="container bg-danger" 
+        v-if="checkOrder.orderItem.length > 0">
+            <div class="row justify-content-center p-5">
+                <div class="col-md-8 bg-white p-3">
+                    <table class="table table-hover ">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>飲品</th>
+                                <th>冰塊</th>
+                                <th>甜度</th>
+                                <th>加料</th>
+                                <th>單價</th>
+                                <th>數量</th>
+                                <th>小計</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item,key) in checkOrder.orderItem"
+                            :key="'orders' + key">
+                                <th>{{item.name}}<br>
+                                    <small class="text-muted"
+                                    v-if="item.notice !== ''">備註：{{item.notice}}</small>
+                                </th>
+                                <td>{{item.ice}}</td>
+                                <td>{{item.sugar}}</td>
+                                <td>{{item.toppings.join()}}</td>
+                                <td>{{item.price +  (item.toppings.length * 10)}}</td>
+                                <td>{{item.count}}</td>
+                                <td class="text-end">NT$ {{item.subTotal}} 元</td>
+                            </tr>
+                        </tbody>
+                    </table>    
+                    <p>訂單成立時間：{{checkOrder.time}}</p>
+                    <p>餐點數：{{checkOrder.orderItem.length}}</p>
+                    <p>付款狀況：未付款</p>
+                    <p class="text-end fw-bold">總共：NT$ {{checkOrder.totalPrice}} 元</p> 
+                    <!-- <button type="button" class="btn btn-danger"
+                    @click.prevent="clickDeletecheckOrder">刪除</button>                -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+
+    <script src="./js/all.js"></script>
+</body>
+</html>
